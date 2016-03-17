@@ -2,10 +2,12 @@ package com.leo.calculator.rpn;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.Stack;
 import java.util.StringTokenizer;
 import java.util.function.BiFunction;
+
+import com.leo.calculator.VariableKey;
+import com.leo.calculator.Variables;
 
 /**
  * Calculate formula in Reverse Polish Notation.<br>
@@ -43,15 +45,16 @@ public class RPNCalculator {
 		}
 	};
 
-	public BigDecimal calculate(String expression, Map<String, BigDecimal> param) {
+	public <K extends Enum<K> & VariableKey> BigDecimal calculate(
+			String expression, Variables<K> param) {
 		StringTokenizer tokenizer = new StringTokenizer(expression, " ");
 
 		Stack<BigDecimal> stack = new Stack<>();
 		while (tokenizer.hasMoreTokens()) {
 			String token = tokenizer.nextToken();
 			if (Operator.isOperator(token)) {
-				stack.push(Operator.tokenOf(token).apply(stack.pop(),
-						stack.pop()));
+				BigDecimal p2 = stack.pop(), p1 = stack.pop();
+				stack.push(Operator.tokenOf(token).apply(p1, p2));
 			} else {
 				if (NumberUtil.isNumber(token)) {
 					stack.push(new BigDecimal(token));
