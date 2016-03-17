@@ -12,7 +12,7 @@ import com.leo.calculator.Variables;
 /**
  * Calculate formula in Reverse Polish Notation.<br>
  * Each token is split by blank space. <br>
- * e.g. A1 + A2 -> A1 A2 +
+ * e.g. A1 + A2 - 3 -> A1 A2 + 3 -
  */
 public class RPNCalculator {
 
@@ -45,8 +45,14 @@ public class RPNCalculator {
 		}
 	};
 
+	private final String expression;
+
+	public RPNCalculator(String expression) {
+		this.expression = expression;
+	}
+
 	public <K extends Enum<K> & VariableKey> BigDecimal calculate(
-			String expression, Variables<K> param) {
+			Variables<K> param) {
 		StringTokenizer tokenizer = new StringTokenizer(expression, " ");
 
 		Stack<BigDecimal> stack = new Stack<>();
