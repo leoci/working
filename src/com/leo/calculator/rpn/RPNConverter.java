@@ -1,0 +1,98 @@
+package com.leo.calculator.rpn;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.List;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+public final class RPNConverter {
+	
+	@RequiredArgsConstructor
+	@Getter
+	enum Sign {
+		ADDITIVE("+", Priority.LOW), 
+		SUBTRACTION("-", Priority.LOW), 
+		MULTIPLICATION("*", Priority.HIGH), 
+		DIVISION("/", Priority.HIGH),
+		BRACKET_LEFT("(", Priority.NONE),
+		BRACKET_RIGHT(")", Priority.NONE),
+		;
+
+		private final String token;
+		private final Priority priority;
+
+		static Sign tokenOf(String token) {
+			return Arrays.stream(values()).filter(o -> o.token.equals(token)).findFirst().orElseThrow(IllegalArgumentException::new);
+		}
+		
+		static boolean isOperator(String token) {
+			return token.matches("[-+*/]");
+		}
+		
+		static boolean isBracket(String token) {
+			return token.matches("[()]");
+		}
+		
+		boolean isPriorTo(Sign other) {
+			return priority.compareTo(other.priority) > 0;
+		}
+		
+		boolean isInferiorTo(Sign other) {
+			return priority.compareTo(other.priority) < 0;
+		}
+		
+	}
+	
+	enum Priority {
+		NONE,LOW,HIGH;
+	}
+	
+	public static RPNExpression convert(String input) {
+		return convert(input.split(RPNExpression.DELIM));
+	}
+	
+	/**
+	 * ( A + B ) * 3 -> ["(","A","+","B",")","*","3"] -> A B + 3 *
+	 */
+	public static RPNExpression convert(String[] input) {
+		List<String> rpn = new ArrayList<>(); 
+		Deque<Sign> oStack = new ArrayDeque<>(); 
+		for (String token : input) {
+			if (Sign.isOperator(token)) {
+				Sign operator = Sign.tokenOf(token);
+				if (oStack.isEmpty()) {
+					oStack.push(operator);
+					continue;
+				}
+				Sign o1 = operator, o2 = oStack.peek();
+				while (!oStack.isEmpty() && !o1.isPriorTo(o2)) {
+					rpn.add(oStack.pop().getToken());
+					o2 = oStack.peek();
+				}
+				oStack.push(operator);
+			} else if (Sign.isBracket(token)) {
+				Sign bracket = Sign.tokenOf(token);
+				if (bracket == Sign.BRACKET_LEFT) {
+					oStack.push(bracket);
+				} else {
+					while (oStack.peek() != Sign.BRACKET_LEFT) {
+						rpn.add(oStack.pop().getToken());
+					}
+					oStack.remove();
+				}
+			} else {
+				rpn.add(token);
+			}
+		}
+		while (!oStack.isEmpty()) {
+			rpn.add(oStack.pop().getToken());
+		}
+		String expression = String.join(RPNExpression.DELIM, rpn);
+		return new RPNExpression(expression);
+	}
+
+}
