@@ -2,7 +2,8 @@ package com.leo.calculator.rent;
 
 public enum RentType {
 
-	FIXED("固定", CalculateType.FIXED), STEPUP("逓増", CalculateType.PERCENTAGE) {
+	FIXED("固定", CalculateType.FIXED), 
+	STEPUP("逓増", CalculateType.PERCENTAGE) {
 
 	},
 	STEPDOWN("逓減", CalculateType.PERCENTAGE) {

@@ -2,7 +2,11 @@ package com.leo.calculator.rpn;
 
 import java.math.BigDecimal;
 
-public class NumberUtil {
+/**
+ * apachecommonsNumberUtils入れて使って欲しい。
+ */
+@Deprecated
+public class NumberUtils {
 
 	public static boolean isNumber(String val) {
 		try {

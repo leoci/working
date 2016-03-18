@@ -30,8 +30,7 @@ public class RPNCalculatorTest {
 		calculator = new RPNCalculator("A1 A2 + 3 *");
 		assertThat(calculator.calculate(variables), is(BigDecimal.valueOf(6.6)));
 		calculator = new RPNCalculator("A1 1.1 *");
-		assertThat(calculator.calculate(variables),
-				is(BigDecimal.valueOf(1.21)));
+		assertThat(calculator.calculate(variables), is(BigDecimal.valueOf(1.21)));
 		calculator = new RPNCalculator("A1 1.1 /");
 		assertThat(calculator.calculate(variables), is(BigDecimal.valueOf(1.0)));
 		calculator = new RPNCalculator("A1 A2 * 1.1 /");
