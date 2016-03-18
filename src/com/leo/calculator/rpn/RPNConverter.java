@@ -20,6 +20,7 @@ public final class RPNConverter {
 		DIVISION("/", Priority.HIGH),
 		BRACKET_LEFT("(", Priority.NONE),
 		BRACKET_RIGHT(")", Priority.NONE),
+		
 		;
 
 		private final String token;
