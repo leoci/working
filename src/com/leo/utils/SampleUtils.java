@@ -1,36 +1,36 @@
 package com.leo.utils;
 
-import java.text.MessageFormat;
-import java.text.Normalizer;
+import java.text.DateFormat;
 import java.util.Arrays;
-import java.util.Iterator;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 public class SampleUtils {
 
 	public static void main(String[] args) {
-//		String res = Normalizer.normalize("ｺﾚﾊーﾃｽﾄﾃﾞｽ～$'<>",
-//				Normalizer.Form.NFKC);
-//		System.out.println(res);
-
-		List<Long> list = Arrays.asList(11L, 2L, 3L,11L,3L,2L);
-//		List<List<Integer>> test = Arrays.asList(list, list, list);
-//
-//		System.out.println(test.stream().count());
-//		System.out.println(test.stream().flatMap(l -> l.stream()).count());
-
-		Iterator<Long> it = list.iterator();
-		if (it.hasNext()) {
-			it.next();
+		
+		System.out.println(Locale.getDefault(Locale.Category.FORMAT));
+		
+		List<String> s = Arrays.asList("a",null,"b");
+		
+		s.stream().sorted(Comparator.comparing(String::toString, Comparator.nullsFirst(Comparator.naturalOrder()))).forEach(System.out::println);
+		
+	}
+	
+	static class Sample{ 
+		
+		String code;
+		
+		public Sample(String code) {
+			this.code = code;
 		}
-		//it.forEachRemaining(System.out::println);
-		
-		list.stream().distinct().forEach(System.out::println);
-		
-		String s = MessageFormat.format("aaa%s", "sss");
-		System.out.println(s);
-		
-		
+		public String getCode() {
+			return code;
+		}
+		public void setCode(String code) {
+			this.code = code;
+		}
 	}
 
 }
