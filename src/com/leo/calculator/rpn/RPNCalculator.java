@@ -17,10 +17,11 @@ import com.leo.calculator.Variables;
 public class RPNCalculator {
 
 	enum Operator {
-		ADDITIVE("+", (p1, p2) -> p1.add(p2)), SUBTRACTION("-", (p1, p2) -> p1
-				.subtract(p2)), MULTIPLICATION("*", (p1, p2) -> p1.multiply(p2)), DIVISION(
-				"/", (p1, p2) -> p1
-						.divide(p2, Math.max(p1.scale(), p2.scale()))), ;
+		ADDITIVE("+", (p1, p2) -> p1.add(p2)), 
+		SUBTRACTION("-", (p1, p2) -> p1.subtract(p2)), 
+		MULTIPLICATION("*", (p1, p2) -> p1.multiply(p2)), 
+		DIVISION("/", (p1, p2) -> p1.divide(p2, Math.max(p1.scale(), p2.scale()))), 
+		;
 
 		private final String token;
 		private final BiFunction<BigDecimal, BigDecimal, BigDecimal> operation;
@@ -51,8 +52,7 @@ public class RPNCalculator {
 		this.expression = expression;
 	}
 
-	public <K extends Enum<K> & VariableKey> BigDecimal calculate(
-			Variables<K> param) {
+	public <K extends Enum<K> & VariableKey> BigDecimal calculate(Variables<K> param) {
 		StringTokenizer tokenizer = new StringTokenizer(expression, " ");
 
 		Stack<BigDecimal> stack = new Stack<>();
