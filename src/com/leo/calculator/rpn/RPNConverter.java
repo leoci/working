@@ -10,58 +10,56 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 public final class RPNConverter {
-	
+
 	@RequiredArgsConstructor
 	@Getter
 	enum Sign {
-		ADDITIVE("+", Priority.LOW), 
-		SUBTRACTION("-", Priority.LOW), 
-		MULTIPLICATION("*", Priority.HIGH), 
-		DIVISION("/", Priority.HIGH),
-		BRACKET_LEFT("(", Priority.NONE),
-		BRACKET_RIGHT(")", Priority.NONE),
-		
-		;
+		ADDITIVE("+", Priority.LOW), SUBTRACTION("-", Priority.LOW), MULTIPLICATION(
+				"*", Priority.HIGH), DIVISION("/", Priority.HIGH), BRACKET_LEFT(
+						"(", Priority.NONE), BRACKET_RIGHT(")", Priority.NONE),
+
+						;
 
 		private final String token;
 		private final Priority priority;
 
 		static Sign tokenOf(String token) {
-			return Arrays.stream(values()).filter(o -> o.token.equals(token)).findFirst().orElseThrow(IllegalArgumentException::new);
+			return Arrays.stream(values()).filter(o -> o.token.equals(token))
+					.findFirst().orElseThrow(IllegalArgumentException::new);
 		}
-		
+
 		static boolean isOperator(String token) {
 			return token.matches("[-+*/]");
 		}
-		
+
 		static boolean isBracket(String token) {
 			return token.matches("[()]");
 		}
-		
+
 		boolean isPriorTo(Sign other) {
 			return priority.compareTo(other.priority) > 0;
 		}
-		
-		boolean isInferiorTo(Sign other) {
-			return priority.compareTo(other.priority) < 0;
-		}
-		
 	}
-	
+
 	enum Priority {
-		NONE,LOW,HIGH;
+		NONE, LOW, HIGH;
 	}
-	
+
 	public static RPNExpression convert(String input) {
-		return convert(input.split(RPNExpression.DELIM));
+		return convert(split(input));
 	}
-	
+
+	private static String[] split(String input) {
+		return input.replaceAll("[ 　]", "").split(
+				"((?<=[-+*/()])|(?=[-+*/()]))");
+	}
+
 	/**
 	 * ( A + B ) * 3 -> ["(","A","+","B",")","*","3"] -> A B + 3 *
 	 */
 	public static RPNExpression convert(String[] input) {
-		List<String> rpn = new ArrayList<>(); 
-		Deque<Sign> oStack = new ArrayDeque<>(); 
+		List<String> rpn = new ArrayList<>();
+		Deque<Sign> oStack = new ArrayDeque<>();
 		for (String token : input) {
 			if (Sign.isOperator(token)) {
 				Sign operator = Sign.tokenOf(token);
