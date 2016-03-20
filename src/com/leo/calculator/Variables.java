@@ -3,6 +3,10 @@ package com.leo.calculator;
 import java.math.BigDecimal;
 import java.util.EnumMap;
 
+/**
+ * 数式に利用する変数用のMap。<br>
+ * VariableKeyを継承したEnumを用意して作成します。
+ */
 public class Variables<K extends Enum<K> & VariableKey> extends
 		EnumMap<K, BigDecimal> {
 

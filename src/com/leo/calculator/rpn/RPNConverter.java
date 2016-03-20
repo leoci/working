@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import com.leo.calculator.VariableKey;
+import com.leo.calculator.Variables;
 
 public final class RPNConverter {
 
@@ -47,14 +48,20 @@ public final class RPNConverter {
 		NONE, LOW, HIGH;
 	}
 
+	/**
+	 * 通常の数式の整合性を確認します<br>
+	 * 変数はkeyTypeに指定された文字列のみ許容します。<br>
+	 * i.e. 大文字英数とアンダースコアのみ許容。
+	 * 
+	 * @param input
+	 *            数式 e.g. ( A + B ) * 3
+	 * @param keyType
+	 *            利用する{@link Variables}のenumクラスを指定
+	 */
 	public static <K extends Enum<K> & VariableKey> boolean canConvert(String input, Class<K> keyType) {
 		return Arrays.stream(split(input)).filter(t -> !Sign.isOperator(t))
 				.filter(t -> !Sign.isBracket(t))
 				.allMatch(t -> EnumUtils.isValidEnum(keyType, t));
-	}
-
-	public static RPNExpression convert(String input) {
-		return convert(split(input));
 	}
 
 	private static String[] split(String input) {
@@ -62,7 +69,18 @@ public final class RPNConverter {
 	}
 
 	/**
-	 * ( A + B ) * 3 -> ["(","A","+","B",")","*","3"] -> A B + 3 *
+	 * 通常の式を逆ポーランド記法にコンバートします。<br>
+	 * {@link #canConvert(String, Class)}でチェックした上での利用を推奨します。<br>
+	 * e.g. ( A + B ) * 3 -> ["(","A","+","B",")","*","3"] -> A B + 3 *
+	 */
+	public static RPNExpression convert(String input) {
+		return convert(split(input));
+	}
+
+	/**
+	 * 通常の式（文字列の配列）を逆ポーランド記法にコンバートします。<br>
+	 * 基本的には文字列での利用{@link #convert(String)}を推奨します。<br>
+	 * e.g. ["(","A","+","B",")","*","3"] -> A B + 3 *
 	 */
 	public static RPNExpression convert(String[] input) {
 		List<String> rpn = new ArrayList<>();
