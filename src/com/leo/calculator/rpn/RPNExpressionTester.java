@@ -4,6 +4,9 @@ import com.leo.calculator.VariableKey;
 
 public final class RPNExpressionTester {
 
+	private RPNExpressionTester() {
+	}
+
 	/**
 	 * 実際に解析して実行してみます。
 	 * 

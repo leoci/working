@@ -50,8 +50,7 @@ public final class RPNConverter {
 	}
 
 	private static String[] split(String input) {
-		return input.replaceAll("[ 　]", "").split(
-				"((?<=[-+*/()])|(?=[-+*/()]))");
+		return input.replaceAll("[ 　]", "").split("(?<=[-+*/()])|(?=[-+*/()])");
 	}
 
 	/**
