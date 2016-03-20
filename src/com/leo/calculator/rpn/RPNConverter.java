@@ -9,6 +9,8 @@ import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import com.leo.calculator.VariableKey;
+
 public final class RPNConverter {
 
 	@RequiredArgsConstructor
@@ -45,13 +47,18 @@ public final class RPNConverter {
 		NONE, LOW, HIGH;
 	}
 
+	public static <K extends Enum<K> & VariableKey> boolean canConvert(String input, Class<K> keyType) {
+		return Arrays.stream(split(input)).filter(t -> !Sign.isOperator(t))
+				.filter(t -> !Sign.isBracket(t))
+				.allMatch(t -> EnumUtils.isValidEnum(keyType, t));
+	}
+
 	public static RPNExpression convert(String input) {
 		return convert(split(input));
 	}
 
 	private static String[] split(String input) {
-		return input.replaceAll("[ 　]", "").split(
-				"((?<=[-+*/()])|(?=[-+*/()]))");
+		return input.replaceAll("[ 　]", "").split("(?<=[-+*/()])|(?=[-+*/()])");
 	}
 
 	/**

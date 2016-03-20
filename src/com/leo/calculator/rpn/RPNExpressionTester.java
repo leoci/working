@@ -4,6 +4,9 @@ import com.leo.calculator.VariableKey;
 
 public final class RPNExpressionTester {
 
+	private RPNExpressionTester() {
+	}
+
 	/**
 	 * 実際に解析して実行してみます。
 	 * 
@@ -18,6 +21,9 @@ public final class RPNExpressionTester {
 			calculator.calculate(RPNUtil.createRandomVariables(keyType));
 		} catch (Exception e) {
 			// TODO divide into proper categories and throw new hogeExceptions
+			// "式が不正です"//かっこなどの整合性チェック
+			// "利用できない変数が指定されています" //Variablesに指定が無い
+			// "式が正しく評価できませんでした。"// 想定外の不正
 			return false;
 		}
 		return true;
