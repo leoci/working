@@ -1,6 +1,7 @@
 package com.leo.calculator.rpn;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
@@ -22,10 +23,10 @@ public class RPNCalculator {
 	@RequiredArgsConstructor
 	@Getter
 	enum Operator {
-		ADDITIVE("+", (p1, p2) -> p1.add(p2)), SUBTRACTION("-", (p1, p2) -> p1
-				.subtract(p2)), MULTIPLICATION("*", (p1, p2) -> p1.multiply(p2)), DIVISION(
-				"/", (p1, p2) -> p1
-						.divide(p2, Math.max(p1.scale(), p2.scale()))), ;
+		ADDITIVE("+", (p1, p2) -> p1.add(p2)), 
+		SUBTRACTION("-", (p1, p2) -> p1.subtract(p2)), 
+		MULTIPLICATION("*", (p1, p2) -> p1.multiply(p2)), 
+		DIVISION("/", (p1, p2) -> p1.divide(p2, Math.max(p1.scale(), p2.scale()))), ;
 
 		private final String token;
 		private final BiFunction<BigDecimal, BigDecimal, BigDecimal> operation;
@@ -35,7 +36,8 @@ public class RPNCalculator {
 		}
 
 		static Operator tokenOf(String token) {
-			return Arrays.stream(values()).filter(o -> o.token.equals(token))
+			return Arrays.stream(values())
+					.filter(o -> o.token.equals(token))
 					.findFirst().orElseThrow(IllegalArgumentException::new);
 		}
 
@@ -55,8 +57,12 @@ public class RPNCalculator {
 		this.expression = expression;
 	}
 
-	public <K extends Enum<K> & VariableKey> BigDecimal calculate(
-			Variables<K> param) {
+	public <K extends Enum<K> & VariableKey> BigDecimal calculate(Variables<K> param, int scale, RoundingMode roundingMode) {
+		BigDecimal res = calculate(param);
+		return res.setScale(scale, roundingMode);
+	}
+
+	public <K extends Enum<K> & VariableKey> BigDecimal calculate(Variables<K> param) {
 		Deque<BigDecimal> stack = new ArrayDeque<>();
 		for (String token : expression.getTokens()) {
 			if (Operator.isOperator(token)) {

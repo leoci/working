@@ -12,8 +12,10 @@ public class RentCalculator {
 	public Result calculate(BigDecimal source, Condition condition) {
 		Result result = new Result(source, condition);
 		// TODO SCALE & ROUNDINGMODE
+		BigDecimal previousUpperThreshold = BigDecimal.ZERO;
 		for (Range range : condition) {
-
+			BigDecimal rangeResult = range.getCalculateMethod().apply();
+			Process process = new Process(from, to, target, subtotal, fraction);
 		}
 		return result;
 	}
