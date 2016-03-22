@@ -5,7 +5,7 @@ import java.math.RoundingMode;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
-import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class RPNCalculator {
 		DIVISION("/", (p1, p2) -> p1.divide(p2, Math.max(p1.scale(), p2.scale()))), ;
 
 		private final String token;
-		private final BiFunction<BigDecimal, BigDecimal, BigDecimal> operation;
+		private final BinaryOperator<BigDecimal> operation;
 
 		BigDecimal apply(BigDecimal p1, BigDecimal p2) {
 			return this.operation.apply(p1, p2);

@@ -1,5 +1,6 @@
 package com.leo.calculator.rent;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -7,7 +8,13 @@ import java.util.function.Predicate;
 import lombok.Data;
 
 public final class CaseBuilder<A> {
-
+	
+	public static final Predicate<BigDecimal> ALWAYS = new Predicate() {
+		public boolean test(A t) {
+			return true;
+		};
+	};
+	
 	@Data
 	private static class CaseElement<A> {
 
@@ -23,7 +30,11 @@ public final class CaseBuilder<A> {
 			cases.add(0, new CaseElement<A>(when));
 			return this;
 		}
-
+		
+		public abstract Cases<A> setSource(A source);
+		
+		public abstract A getResult();
+		
 	}
 
 	public static class CaseWhen<A> {
@@ -39,7 +50,7 @@ public final class CaseBuilder<A> {
 
 	}
 
-	public static class Initial<A> {
+	public static class Initial<A> extends Cases<A> {
 
 		private final Predicate<A> when;
 
@@ -47,15 +58,16 @@ public final class CaseBuilder<A> {
 			this.when = when;
 		}
 
-		private Cases<A> then() {
+		Cases<A> then(A val) {
 			return new Cases<A>() {
 
 			}.addCase(when);
 		}
-
+		
 	}
 
-	public Initial<A> when(Predicate<A> when) {
+	public static <A> Initial<A> when(Predicate<A> when) {
 		return new Initial<>(when);
 	}
+	
 }
