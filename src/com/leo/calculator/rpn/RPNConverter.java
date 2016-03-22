@@ -17,11 +17,13 @@ public final class RPNConverter {
 	@RequiredArgsConstructor
 	@Getter
 	enum Sign {
-		ADDITIVE("+", Priority.LOW), SUBTRACTION("-", Priority.LOW), MULTIPLICATION(
-				"*", Priority.HIGH), DIVISION("/", Priority.HIGH), BRACKET_LEFT(
-						"(", Priority.NONE), BRACKET_RIGHT(")", Priority.NONE),
-
-						;
+		ADDITIVE("+", Priority.LOW), 
+		SUBTRACTION("-", Priority.LOW), 
+		MULTIPLICATION("*", Priority.HIGH), 
+		DIVISION("/", Priority.HIGH), 
+		BRACKET_LEFT("(", Priority.NONE), 
+		BRACKET_RIGHT(")", Priority.NONE),
+		;
 
 		private final String token;
 		private final Priority priority;
@@ -51,7 +53,7 @@ public final class RPNConverter {
 	/**
 	 * 通常の数式の整合性を確認します<br>
 	 * 変数はkeyTypeに指定された文字列のみ許容します。<br>
-	 * i.e. 大文字英数とアンダースコアのみ許容。
+	 * i.e. 大文字英数とアンダースコアのみ許容。空白は無視
 	 * 
 	 * @param input
 	 *            数式 e.g. ( A + B ) * 3
@@ -65,7 +67,7 @@ public final class RPNConverter {
 	}
 
 	private static String[] split(String input) {
-		return input.replaceAll("[ 　]", "").split("(?<=[-+*/()])|(?=[-+*/()])");
+		return input.replaceAll("[ ]", "").split("(?<=[-+*/()])|(?=[-+*/()])");
 	}
 
 	/**
