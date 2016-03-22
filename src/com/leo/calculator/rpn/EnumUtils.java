@@ -10,7 +10,12 @@ public class EnumUtils {
 
 	static <E extends Enum<E>> boolean isValidEnum(Class<E> keyType,
 			String value) {
-		return EnumSet.allOf(keyType).contains(value);
+		try {
+            Enum.valueOf(keyType, value);
+            return true;
+        } catch (IllegalArgumentException ex) {
+            return false;
+        }
 	}
 
 }

@@ -67,6 +67,11 @@ public final class RPNConverter {
 				.allMatch(t -> EnumUtils.isValidEnum(keyType, t));
 	}
 	
+	public static void main(String[] args) {
+		System.out.println(Arrays.toString(split("(A + B )* 3 + 4")));
+		System.out.println(canConvert("(A + B )* 3 + 4", RPNUtil.TestKey.class));
+	}
+	
 	private static String[] split(String input) {
 		return input.replaceAll("[ ]", "").split("(?<=[-+*/()])|(?=[-+*/()])");
 	}
