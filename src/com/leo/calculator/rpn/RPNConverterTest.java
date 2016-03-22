@@ -13,9 +13,9 @@ public class RPNConverterTest {
 	@Test
 	public void test() {
 		assertThat(
-				RPNConverter.canConvert("1+ 2 + 3 + 4", RPNUtil.TestKey.class),
+				RPNConverter.canConvert("(A + B　)* 3 + 4", RPNUtil.TestKey.class),
 				is(true));
-
+		
 		assertThat(RPNConverter.convert("1+ 2 + 3 + 4").getExpression(),
 				is("1 2 + 3 + 4 +"));
 		assertThat(RPNConverter.convert("1 - 2").getExpression(), is("1 2 -"));

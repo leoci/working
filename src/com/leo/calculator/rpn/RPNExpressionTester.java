@@ -14,11 +14,15 @@ public final class RPNExpressionTester {
 	 *            e.g. "( A1 + 3.3 ) * 3"
 	 */
 	public static <K extends Enum<K> & VariableKey> boolean test(String input, Class<K> keyType) {
+		if (!RPNConverter.canConvert(input, keyType)) {
+			return false;
+		}
 		try {
 			RPNExpression expression = RPNConverter.convert(input);
 			RPNCalculator calculator = new RPNCalculator(expression);
 			calculator.calculate(RPNUtil.createRandomVariables(keyType));
 		} catch (Exception e) {
+			e.printStackTrace();
 			// TODO divide into proper categories and throw new hogeExceptions
 			// "式が不正です"//括弧や演算子などの整合性チェック
 			// "利用できない変数が指定されています" //Variablesに指定が無い

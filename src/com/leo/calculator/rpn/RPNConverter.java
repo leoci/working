@@ -63,9 +63,10 @@ public final class RPNConverter {
 	public static <K extends Enum<K> & VariableKey> boolean canConvert(String input, Class<K> keyType) {
 		return Arrays.stream(split(input)).filter(t -> !Sign.isOperator(t))
 				.filter(t -> !Sign.isBracket(t))
+				.filter(t -> !NumberUtils.isNumber(t))
 				.allMatch(t -> EnumUtils.isValidEnum(keyType, t));
 	}
-
+	
 	private static String[] split(String input) {
 		return input.replaceAll("[ ]", "").split("(?<=[-+*/()])|(?=[-+*/()])");
 	}
