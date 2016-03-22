@@ -2,22 +2,24 @@ package com.leo.calculator.rent;
 
 import java.math.BigDecimal;
 
+import com.leo.calculator.rent.CaseBuilder.Cases;
+
 public class RentCalculator {
 
-	public BigDecimal calculate(long id) {
-		// TODO load config & varibles
-		return calculate(BigDecimal.valueOf(2_200_000), null).getTotal();
+	private final Cases cases;
+
+	public RentCalculator(Cases cases) {
+		this.cases = cases;
 	}
 
-	public Result calculate(BigDecimal source, Condition condition) {
-		Result result = new Result(source, condition);
-		// TODO SCALE & ROUNDINGMODE
-		BigDecimal previousUpperThreshold = BigDecimal.ZERO;
-		for (Range range : condition) {
-			BigDecimal rangeResult = range.getCalculateMethod().apply();
-			Process process = new Process(from, to, target, subtotal, fraction);
+	public BigDecimal calculate(BigDecimal source) {
+		if (cases.getMinimum().filter(c -> c.getWhen().test(source)).isPresent()) {
+			return cases.getMinimum().get().getOperator().apply(source);
 		}
-		return result;
+		return cases.getCases().stream()
+				.filter(c -> c.getWhen().test(source))
+				.map(c -> c.getOperator().apply(source))
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
 
 }

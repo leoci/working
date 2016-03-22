@@ -3,71 +3,95 @@ package com.leo.calculator.rent;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-public final class CaseBuilder<A> {
-	
-	public static final Predicate<BigDecimal> ALWAYS = new Predicate() {
-		public boolean test(A t) {
-			return true;
-		};
-	};
-	
-	@Data
-	private static class CaseElement<A> {
+public final class CaseBuilder {
 
-		private final Predicate<A> when;
-
+	@RequiredArgsConstructor
+	@Getter
+	public static class CaseElement {
+		private final Predicate<BigDecimal> when;
+		private final UnaryOperator<BigDecimal> operator;
 	}
 
-	public abstract static class Cases<A> {
+	@Data
+	public static class Cases {
 
-		private final List<CaseElement<A>> cases = new ArrayList<>();
+		private Optional<CaseElement> minimum = Optional.empty();
+		private final List<CaseElement> cases = new ArrayList<>();
 
-		Cases<A> addCase(Predicate<A> when) {
-			cases.add(0, new CaseElement<A>(when));
+		Cases addMinimumCase(Predicate<BigDecimal> when,
+				UnaryOperator<BigDecimal> operator) {
+			minimum = Optional.of(new CaseElement(when, operator));
 			return this;
 		}
-		
-		public abstract Cases<A> setSource(A source);
-		
-		public abstract A getResult();
-		
+
+		Cases addCase(Predicate<BigDecimal> when,
+				UnaryOperator<BigDecimal> operator) {
+			cases.add(new CaseElement(when, operator));
+			return this;
+		}
+
+		public Cases always(UnaryOperator<BigDecimal> operator) {
+			return addCase(ALWAYS, operator);
+		}
+
+		public CaseWhen when(Predicate<BigDecimal> when) {
+			return new CaseWhen(this, when);
+		}
+
+		public Cases append(Cases other) {
+			cases.addAll(other.getCases());
+			return this;
+		}
+
+		public RentCalculator build() {
+			return new RentCalculator(this);
+		}
 	}
 
-	public static class CaseWhen<A> {
+	@RequiredArgsConstructor
+	public static class CaseWhen {
 
-		private final Predicate<A> when;
+		private final Cases cases;
 
-		private final Cases<A> cases;
+		private final Predicate<BigDecimal> when;
 
-		public CaseWhen(Cases<A> cases, Predicate<A> when) {
-			this.cases = cases;
-			this.when = when;
+		public Cases then(UnaryOperator<BigDecimal> operator) {
+			return cases.addCase(when, operator);
 		}
 
 	}
 
-	public static class Initial<A> extends Cases<A> {
+	@RequiredArgsConstructor
+	public static class CaseWhenMinimum {
 
-		private final Predicate<A> when;
+		private final Predicate<BigDecimal> when;
 
-		public Initial(Predicate<A> when) {
-			this.when = when;
+		public Cases then(UnaryOperator<BigDecimal> operator) {
+			return new Cases().addMinimumCase(when, operator);
 		}
 
-		Cases<A> then(A val) {
-			return new Cases<A>() {
-
-			}.addCase(when);
-		}
-		
 	}
 
-	public static <A> Initial<A> when(Predicate<A> when) {
-		return new Initial<>(when);
+	private static final Predicate<BigDecimal> ALWAYS = b -> true;// Predicates.alwaysTrue();
+
+	public static Cases always(UnaryOperator<BigDecimal> operator) {
+		return new Cases().addCase(ALWAYS, operator);
 	}
-	
+
+	public static CaseWhenMinimum minimumOf(Predicate<BigDecimal> when) {
+		return new CaseWhenMinimum(when);
+	}
+
+	public static CaseWhen when(Predicate<BigDecimal> when) {
+		return new CaseWhen(new Cases(), when);
+	}
+
 }
