@@ -13,6 +13,6 @@ public class Process {
 	private final BigDecimal subtotal;
 	private final BigDecimal fraction;
 
-	private String memo;
+	private String autoMemo;
 
 }
