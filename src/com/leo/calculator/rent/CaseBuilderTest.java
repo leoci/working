@@ -3,6 +3,7 @@ package com.leo.calculator.rent;
 import static com.leo.calculator.rent.OperatorBuilder.fixed;
 import static com.leo.calculator.rent.OperatorBuilder.fixedRate;
 import static com.leo.calculator.rent.OperatorBuilder.rangeRate;
+import static com.leo.calculator.rent.OperatorBuilder.rangeRateFrom;
 import static com.leo.calculator.rent.OperatorBuilder.rate;
 import static com.leo.calculator.rent.PredicateBuilder.at;
 import static com.leo.calculator.rent.PredicateBuilder.upto;
@@ -21,7 +22,7 @@ public class CaseBuilderTest {
 	 */
 	@Test
 	public void test_case_1() {
-		RentCalculator calculator_1_1 = CaseBuilder.always(fixed(80_000L)).build(RoundingMode.UP);
+		RentCalculator calculator_1_1 = CaseBuilder.always(fixed(80_000L).note("固定")).build(RoundingMode.UP);
 		RentCalculator calculator_1_2 = CaseBuilder.always(fixed(80_000L)).build(RoundingMode.DOWN);
 		RentCalculator calculator_1_3 = CaseBuilder.always(fixed(100_000L)).build(RoundingMode.HALF_UP);
 
@@ -29,7 +30,7 @@ public class CaseBuilderTest {
 		assertThat(calculator_1_2.calculate(BigDecimal.valueOf(80_000L)), is(BigDecimal.valueOf(80_000L)));
 		assertThat(calculator_1_3.calculate(BigDecimal.valueOf(100_001L)), is(BigDecimal.valueOf(100_000L)));
 	}
-	
+
 	/**
 	 * 完全歩合
 	 */
@@ -41,7 +42,7 @@ public class CaseBuilderTest {
 		RentCalculator calculator_2_4 = CaseBuilder.always(rate(3d)).build(RoundingMode.DOWN);
 		RentCalculator calculator_2_5 = CaseBuilder.always(rate(3d)).build(RoundingMode.HALF_UP);
 		RentCalculator calculator_2_6 = CaseBuilder.always(rate(5d)).build(RoundingMode.HALF_UP);
-		
+
 		assertThat(calculator_2_1.calculate(BigDecimal.valueOf(80_016L)), is(BigDecimal.valueOf(2_401L)));
 		assertThat(calculator_2_2.calculate(BigDecimal.valueOf(80_017L)), is(BigDecimal.valueOf(2_401L)));
 		assertThat(calculator_2_3.calculate(BigDecimal.valueOf(80_016L)), is(BigDecimal.valueOf(2_400L)));
@@ -49,7 +50,7 @@ public class CaseBuilderTest {
 		assertThat(calculator_2_5.calculate(BigDecimal.valueOf(80_016L)), is(BigDecimal.valueOf(2_400L)));
 		assertThat(calculator_2_6.calculate(BigDecimal.valueOf(80_011L)), is(BigDecimal.valueOf(4_001L)));
 	}
-	
+
 	/**
 	 * 固定＋完全歩合
 	 */
@@ -80,7 +81,7 @@ public class CaseBuilderTest {
 		assertThat(calculator_4_2.calculate(BigDecimal.valueOf(120_011L)), is(BigDecimal.valueOf(6_000L)));
 		assertThat(calculator_4_3.calculate(BigDecimal.valueOf(120_012L)), is(BigDecimal.valueOf(6_001L)));
 	}
-	
+
 	/**
 	 * 売上逓減＋固定保証
 	 */
@@ -89,7 +90,7 @@ public class CaseBuilderTest {
 		RentCalculator calculator_5_1 = CaseBuilder.minimumOf(upto(50_000L)).then(fixedRate(50_000L, 10d))
 				.append(
 						CaseBuilder
-						.when(at(200_000L)).then(rangeRate(200_000L, 3d))
+						.when(at(200_000L)).then(rangeRateFrom(200_000L, 3d))
 						.when(at(80_000L)).then(rangeRate(80_000L, 200_000L, 5d))
 						.when(at(0L)).then(rangeRate(0L, 80_000L, 8d))
 						).build(RoundingMode.DOWN);
@@ -97,23 +98,38 @@ public class CaseBuilderTest {
 		assertThat(calculator_5_1.calculate(BigDecimal.valueOf(50_000L)), is(BigDecimal.valueOf(5_000L)));
 		assertThat(calculator_5_1.calculate(BigDecimal.valueOf(120_000L)), is(BigDecimal.valueOf(8_400L)));
 	}
-	
+
 	/**
 	 * 固定＋売上逓減
-	 * 
 	 */
 	@Test
 	public void test_case_6() {
 		RentCalculator calculator_6_1 = CaseBuilder.base(fixedRate(50_000L, 10d))
 				.append(
 						CaseBuilder
-						.when(at(200_000L)).then(rangeRate(200_000L, 3d))
+						.when(at(200_000L)).then(rangeRateFrom(200_000L, 3d))
 						.when(at(80_000L)).then(rangeRate(80_000L, 200_000L, 5d))
 						.when(at(0L)).then(rangeRate(0L, 80_000L, 8d))
 						).build(RoundingMode.DOWN);
 
 		assertThat(calculator_6_1.calculate(BigDecimal.valueOf(50_000L)), is(BigDecimal.valueOf(9_000L)));
 		assertThat(calculator_6_1.calculate(BigDecimal.valueOf(120_000L)), is(BigDecimal.valueOf(13_400L)));
+	}
+
+	/**
+	 * 逓減＋最低保障
+	 */
+	@Test
+	public void test_case_7() {
+		RentCalculator calculator_7_1 = CaseBuilder
+				.when(at(200_000L)).then(rangeRateFrom(200_000L, 3d))
+				.when(at(80_000L)).then(rangeRate(80_000L, 200_000L, 5d))
+				.when(at(0L)).then(rangeRate(0L, 80_000L, 8d))
+				.whenResultIs(upto(6_000L)).then(fixed(6_000L).note("賃料に対する最低保障"))
+				.build(RoundingMode.DOWN);
+
+		assertThat(calculator_7_1.calculate(BigDecimal.valueOf(50_000L)), is(BigDecimal.valueOf(6_000L)));
+		assertThat(calculator_7_1.calculate(BigDecimal.valueOf(120_000L)), is(BigDecimal.valueOf(8_400L)));
 	}
 
 	public void playground() {
@@ -133,18 +149,18 @@ public class CaseBuilderTest {
 						.when(at(80_000L)).then(rate(5d))
 						.when(at(0L)).then(rate(8d))
 						).build(RoundingMode.DOWN);
-		
+
 		//80_000以下なら固定50_000、以上であれば範囲ごとの逓減0-80_000:8%, 80_000-200_000:5%, 200_000+:3%
 		RentCalculator calculator_99_3 = CaseBuilder
 				.when(at(80_000L)).then(fixed(50_000L))
 				.append(
 						CaseBuilder
-						.when(at(200_000L)).then(rangeRate(8d))
-						.when(at(80_000L)).then(rangeRate(5d))
-						.when(at(0L)).then(rangeRate(3d))
+						.when(at(200_000L)).then(rate(8d))
+						.when(at(80_000L)).then(rate(5d))
+						.when(at(0L)).then(rate(3d))
 						).build(RoundingMode.DOWN);
-		
-		
+
+
 
 	}
 
