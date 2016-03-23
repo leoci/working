@@ -8,12 +8,20 @@ public final class PredicateBuilder {
 	private PredicateBuilder() {
 	}
 
+	public static Predicate<BigDecimal> upto(long threshold) {
+		return 	upto(BigDecimal.valueOf(threshold));
+	}
+
+	public static Predicate<BigDecimal> upto(BigDecimal threshold) {
+		return s -> s.compareTo(threshold) <= 0;
+	}
+	
 	public static Predicate<BigDecimal> at(long threshold) {
 		return 	at(BigDecimal.valueOf(threshold));
 	}
 
 	public static Predicate<BigDecimal> at(BigDecimal threshold) {
-		return 	s -> s.compareTo(threshold) >= 0;
+		return 	s -> s.compareTo(threshold) > 0;
 	}
 
 	public static Predicate<BigDecimal> between(long from, long to) {

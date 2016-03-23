@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Getter
+@Deprecated //なんか変更されてる
 public enum RentType {
 
 	FIXED("固定"),
