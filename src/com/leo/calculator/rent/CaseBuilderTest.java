@@ -100,6 +100,7 @@ public class CaseBuilderTest {
 	
 	/**
 	 * 固定＋売上逓減
+	 * 
 	 */
 	@Test
 	public void test_case_6() {
