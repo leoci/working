@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 
 import lombok.AccessLevel;
 import lombok.Data;
@@ -143,6 +142,13 @@ public final class CaseBuilder {
 	 */
 	public static CaseWhen when(Predicate<BigDecimal> when) {
 		return new CaseWhen(new Cases(), when);
+	}
+
+	/**
+	 * 動的に作成する場合のベース
+	 */
+	static Cases empty() {
+		return new Cases();
 	}
 
 }

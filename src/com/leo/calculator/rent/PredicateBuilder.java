@@ -3,7 +3,7 @@ package com.leo.calculator.rent;
 import java.math.BigDecimal;
 import java.util.function.Predicate;
 
-public final class PredicateBuilder {
+final class PredicateBuilder {
 
 	private PredicateBuilder() {
 	}

@@ -12,28 +12,37 @@ public class Process {
 	private Optional<BigDecimal> to = Optional.empty();
 	private final BigDecimal target;
 	private Optional<BigDecimal> rate = Optional.empty();
+	private BigDecimal rawValue;
 	private BigDecimal value;
 	private BigDecimal fraction = BigDecimal.ZERO;
 
+	private final ProcessDiv processDiv;
 	private String note;
 
-	public Process(BigDecimal target, BigDecimal value) {
+	public Process(ProcessDiv processDiv, BigDecimal target, BigDecimal value) {
+		this.processDiv = processDiv;
 		this.target = target;
+		this.rawValue = value;
 		this.value = value;
 	}
 
-	public Process(BigDecimal target, BigDecimal rate, BigDecimal value) {
+	public Process(ProcessDiv processDiv, BigDecimal target, BigDecimal rate, 
+			BigDecimal value) {
+		this.processDiv = processDiv;
 		this.target = target;
 		this.rate = Optional.ofNullable(rate);
+		this.rawValue = value;
 		this.value = value;
 	}
 
-	public Process(BigDecimal from, BigDecimal to, BigDecimal target,
+	public Process(ProcessDiv processDiv, BigDecimal from, BigDecimal to, BigDecimal target,
 			BigDecimal rate, BigDecimal value) {
+		this.processDiv = processDiv;
 		this.from = Optional.ofNullable(from);
 		this.to = Optional.ofNullable(to);
 		this.target = target;
 		this.rate = Optional.ofNullable(rate);
+		this.rawValue = value;
 		this.value = value;
 	}
 

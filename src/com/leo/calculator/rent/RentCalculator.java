@@ -8,10 +8,14 @@ import java.util.stream.Collectors;
 
 import com.leo.calculator.rent.CaseBuilder.Cases;
 
+/**
+ * TODO 中間処理の端数処理は決めうち。それぞれ切り捨てて、合計額と差分があれば最後に加算する
+ */
 public class RentCalculator {
 
 	private final Cases cases;
 	private final int scale = 0;
+	private final RoundingMode roundingModeOnProcess = RoundingMode.DOWN;
 	private final RoundingMode roundingMode;
 
 	private static final RoundingMode DEFAULT_ROUNDING_MODE = RoundingMode.DOWN;
@@ -56,8 +60,19 @@ public class RentCalculator {
 	private Result summarize(List<Process> processes) {
 		BigDecimal value = processes.stream().map(Process::getValue).reduce(BigDecimal.ZERO, BigDecimal::add);
 		value = value.setScale(scale, roundingMode);
-		return new Result(value, processes);
 
+		processes.forEach(p -> p.setValue(p.getValue().setScale(scale,
+				roundingModeOnProcess)));
+		BigDecimal offValue = processes.stream().map(Process::getValue)
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
+
+		if (!NumberUtil.equals(value, offValue)) {
+			BigDecimal fraction = value.subtract(offValue);
+			Process lastProcess = processes.get(processes.size() - 1);
+			lastProcess.setValue(lastProcess.getValue().add(fraction));
+			lastProcess.setFraction(fraction);// TODO どう残すべきなのか？
+		}
+		return new Result(value, processes);
 	}
 
 }
